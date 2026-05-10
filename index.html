@@ -1036,7 +1036,7 @@ function submitForm(){
     fetch(GAS_URL,{
       method:'POST',
       mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({
         formType:'leave',
         name:currentUser, dept, leaveType:selLeave,
@@ -1144,7 +1144,7 @@ function submitMissPunch(){
     fetch(GAS_URL,{
       method:'POST',
       mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({
         formType:'punch',
         name:currentUser, punchType:displayType,
