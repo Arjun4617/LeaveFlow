@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>LeaveFlow — AGC Car Accessories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --black: #0A0A0F;
+  --dark1: #111118;
+  --dark2: #18181F;
+  --dark3: #22222C;
+  --dark4: #2E2E3A;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.13);
+  --orange: #FF6B2B;
+  --orange2: #FF8C54;
+  --orange-glow: rgba(255,107,43,0.18);
+  --orange-dim: rgba(255,107,43,0.08);
+  --text: #F0EEF8;
+  --text2: #9996AA;
+  --text3: #5E5C6E;
+  --green: #22C55E;
+  --green-bg: rgba(34,197,94,0.1);
+  --blue: #3B82F6;
+  --blue-bg: rgba(59,130,246,0.1);
+  --red: #EF4444;
+  --red-bg: rgba(239,68,68,0.1);
+  --amber: #F59E0B;
+  --amber-bg: rgba(245,158,11,0.1);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--black);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.5;
+}
+
+/* ── App shell ── */
+#app{width:100%;height:100vh;overflow:hidden;position:relative;}
+.screen{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.28s ease, transform 0.28s ease;
+  transform:translateX(24px);
+}
+.screen.active{opacity:1;pointer-events:all;transform:translateX(0);}
+.screen.slide-out{opacity:0;transform:translateX(-24px);}
+.scroll-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:100px;}
+.scroll-body::-webkit-scrollbar{width:3px;}
+.scroll-body::-webkit-scrollbar-thumb{background:var(--dark4);border-radius:4px;}
+
+/* ── SCREEN 1 — Splash / Name pick ── */
+#s1 .hero{
+  background:var(--dark1);
+  padding:3.5rem 1.5rem 2.5rem;
+  position:relative;overflow:hidden;
+}
+#s1 .hero::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
+  pointer-events:none;
+}
+#s1 .hero::after{
+  content:'';position:absolute;bottom:-40px;left:-40px;
+  width:160px;height:160px;border-radius:50%;
+  background:radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.wordmark{display:flex;align-items:center;gap:10px;margin-bottom:2rem;}
+.wordmark-icon{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 24px var(--orange-glow);
+  flex-shrink:0;
+}
+.wordmark-icon svg{width:22px;height:22px;fill:white;}
+.wordmark-text{display:flex;flex-direction:column;line-height:1.1;}
+.wordmark-app{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
+.wordmark-co{font-size:11px;color:var(--text3);letter-spacing:0.04em;margin-top:2px;}
+#s1 .hero h1{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;line-height:1.2;margin-bottom:8px;}
+#s1 .hero h1 span{color:var(--orange);}
+#s1 .hero p{font-size:14px;color:var(--text2);}
+
+.search-wrap{padding:1.25rem 1.25rem 0.5rem;background:var(--black);position:sticky;top:0;z-index:5;}
+.search-box{
+  display:flex;align-items:center;gap:10px;
+  background:var(--dark2);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  padding:0 14px;
+  transition:border-color 0.2s;
+}
+.search-box:focus-within{border-color:var(--orange);}
+.search-box svg{width:17px;height:17px;fill:var(--text3);flex-shrink:0;}
+.search-box input{
+  flex:1;background:transparent;border:none;outline:none;
+  padding:13px 0;font-size:15px;font-family:'DM Sans',sans-serif;
+  color:var(--text);
+}
+.search-box input::placeholder{color:var(--text3);}
+
+.name-list{padding:0.5rem 1.25rem 2rem;}
+.name-item{
+  display:flex;align-items:center;gap:13px;
+  padding:13px 14px;border-radius:var(--r-md);
+  cursor:pointer;margin-bottom:4px;
+  border:1px solid transparent;
+  transition:background 0.15s,border-color 0.15s;
+}
+.name-item:hover,.name-item:active{background:var(--dark2);border-color:var(--border);}
+.av{
+  width:44px;height:44px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Sora',sans-serif;font-size:14px;font-weight:700;
+  flex-shrink:0;
+}
+.name-item .ni-info{flex:1;}
+.name-item .ni-name{font-size:15px;font-weight:500;color:var(--text);}
+.name-item .ni-dept{font-size:12px;color:var(--text3);margin-top:2px;}
+.name-item .ni-arr{width:20px;height:20px;fill:var(--text3);}
+
+/* ── SCREEN 2 — Dashboard ── */
+#s2 .dash-hero{
+  background:var(--dark1);
+  padding:1.5rem 1.25rem 5rem;
+  position:relative;overflow:hidden;
+}
+#s2 .dash-hero::before{
+  content:'';position:absolute;top:-80px;right:-80px;width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,var(--orange-glow) 0%,transparent 70%);pointer-events:none;
+}
+.dash-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.back-btn{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--dark3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:background 0.15s;flex-shrink:0;
+}
+.back-btn:hover{background:var(--dark4);}
+.back-btn svg{width:18px;height:18px;fill:var(--text2);}
+.dash-topbar .wm-sm{display:flex;align-items:center;gap:8px;}
+.dash-topbar .wm-sm .wi{width:30px;height:30px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;}
+.dash-topbar .wm-sm .wi svg{width:16px;height:16px;fill:white;}
+.dash-topbar .wm-sm span{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;}
+.dash-greeting .hey{font-size:13px;color:var(--text3);}
+.dash-greeting .uname{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;}
+.dash-greeting .uname span{color:var(--orange);}
+
+.dash-body{flex:1;overflow-y:auto;padding:0 1.25rem 2rem;margin-top:-4rem;overscroll-behavior:contain;}
+.dash-body::-webkit-scrollbar{width:3px;}
+.dash-body::-webkit-scrollbar-thumb{background:var(--dark4);border-radius:4px;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
+.stat-box{
+  background:var(--dark2);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:14px 10px;text-align:center;
+}
+.stat-box .sv{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;}
+.stat-box .sl{font-size:11px;color:var(--text3);margin-top:3px;font-weight:500;}
+.stat-box.ap .sv{color:var(--green);}
+.stat-box.pd .sv{color:var(--amber);}
+.stat-box.rj .sv{color:var(--red);}
+
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sec-hdr h2{font-family:'Sora',sans-serif;font-size:16px;font-weight:600;}
+.sec-hdr .count{font-size:12px;color:var(--text3);}
+
+.lcard{
+  background:var(--dark2);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:1rem;margin-bottom:10px;
+  position:relative;overflow:hidden;
+}
+.lcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+.lcard.approved::before{background:var(--green);}
+.lcard.pending::before{background:var(--amber);}
+.lcard.rejected::before{background:var(--red);}
+.lcard-top{display:flex;align-items:center;gap:12px;}
+.lcard-ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lcard-ico svg{width:22px;height:22px;}
+.lcard-ico.casual{background:rgba(34,197,94,0.1);}
+.lcard-ico.casual svg{fill:var(--green);}
+.lcard-ico.sick{background:rgba(59,130,246,0.1);}
+.lcard-ico.sick svg{fill:var(--blue);}
+.lcard-ico.lop{background:rgba(245,158,11,0.1);}
+.lcard-ico.lop svg{fill:var(--amber);}
+.lcard-info{flex:1;}
+.lcard-type{font-weight:600;font-size:15px;color:var(--text);}
+.lcard-dates{font-size:12px;color:var(--text3);margin-top:2px;}
+.lcard-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.dur-lbl{font-size:11px;color:var(--text3);}
+.dur-val{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.05em;}
+.badge.approved{background:var(--green-bg);color:var(--green);}
+.badge.pending{background:var(--amber-bg);color:var(--amber);}
+.badge.rejected{background:var(--red-bg);color:var(--red);}
+
+.empty-state{text-align:center;padding:3rem 1rem;}
+.empty-state svg{width:52px;height:52px;fill:var(--dark4);margin-bottom:1rem;}
+.empty-state p{font-size:14px;color:var(--text3);}
+
+.fab{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:1rem 1.25rem;
+  background:linear-gradient(to top,var(--black) 70%,transparent);
+  pointer-events:none;
+}
+.fab-btn{
+  width:100%;padding:15px;
+  background:var(--orange);
+  border:none;border-radius:var(--r-md);
+  font-family:'Sora',sans-serif;font-size:15px;font-weight:600;
+  color:white;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 24px var(--orange-glow);
+  transition:background 0.15s,transform 0.1s;
+  pointer-events:all;
+}
+.fab-btn:active{transform:scale(0.98);}
+.fab-btn svg{width:20px;height:20px;fill:white;}
+
+/* ── SCREEN 3 — Form ── */
+#s3 .form-header{
+  background:var(--dark1);
+  border-bottom:1px solid var(--border);
+  padding:1.25rem 1.25rem;
+  display:flex;align-items:center;gap:13px;
+  flex-shrink:0;
+}
+#s3 .form-header h2{font-family:'Sora',sans-serif;font-size:17px;font-weight:600;}
+#s3 .form-header .sub{font-size:12px;color:var(--text3);margin-top:1px;}
+
+.form-scroll{flex:1;overflow-y:auto;padding:1.25rem 1.25rem 0;overscroll-behavior:contain;}
+.form-scroll::-webkit-scrollbar{width:3px;}
+.form-scroll::-webkit-scrollbar-thumb{background:var(--dark4);border-radius:4px;}
+
+.fcard{
+  background:var(--dark2);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:1.25rem;margin-bottom:12px;
+}
+.fcard-title{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem;}
+
+.field{margin-bottom:1.1rem;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:6px;}
+.field label .req{color:var(--orange);}
+.field input[type=date],.field select,.field textarea,.field input[type=text]{
+  width:100%;padding:12px 14px;
+  background:var(--dark3);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);
+  font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text);
+  outline:none;transition:border-color 0.2s,background 0.2s;
+  -webkit-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);background:var(--dark4);}
+.field select option{background:var(--dark2);}
+.field textarea{resize:vertical;min-height:85px;line-height:1.5;}
+.field input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.7);}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* Leave type tiles */
+.lt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.lt-tile{
+  background:var(--dark3);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:14px 6px;
+  text-align:center;cursor:pointer;
+  transition:all 0.18s;
+}
+.lt-tile:active{transform:scale(0.97);}
+.lt-tile.sel{border-color:var(--orange);background:var(--orange-dim);box-shadow:0 0 16px var(--orange-glow);}
+.lt-tile svg{width:24px;height:24px;fill:var(--text3);display:block;margin:0 auto 6px;}
+.lt-tile.sel svg{fill:var(--orange);}
+.lt-tile span{font-size:11px;font-weight:600;color:var(--text3);}
+.lt-tile.sel span{color:var(--orange2);}
+
+/* Sick upload */
+.sick-block{display:none;margin-top:12px;}
+.upload-area{
+  border:2px dashed var(--border2);border-radius:var(--r-sm);
+  padding:1.5rem;text-align:center;cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+  background:var(--dark3);
+}
+.upload-area:hover{border-color:var(--orange);background:var(--dark4);}
+.upload-area svg{width:32px;height:32px;fill:var(--text3);margin-bottom:8px;}
+.upload-area p{font-size:13px;color:var(--text3);}
+.upload-area .up-hint{font-size:11px;color:var(--text3);margin-top:4px;opacity:0.6;}
+.upload-area input[type=file]{display:none;}
+.presc-preview{max-width:100%;max-height:180px;border-radius:var(--r-sm);margin-top:10px;display:none;border:1px solid var(--border2);}
+.up-fname{font-size:12px;color:var(--orange);margin-top:6px;display:none;text-align:center;}
+
+/* Day count pill */
+.day-pill{
+  display:none;margin-top:8px;
+  background:var(--orange-dim);border:1px solid var(--orange-glow);
+  border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;
+  color:var(--orange2);text-align:center;width:fit-content;
+}
+
+/* Report options */
+.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rep-tile{
+  background:var(--dark3);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:14px 12px;
+  cursor:pointer;display:flex;align-items:center;gap:10px;
+  transition:all 0.18s;
+}
+.rep-tile:active{transform:scale(0.97);}
+.rep-tile.sel{border-color:var(--blue);background:rgba(59,130,246,0.08);}
+.rep-tile svg{width:22px;height:22px;fill:var(--text3);flex-shrink:0;}
+.rep-tile.sel svg{fill:var(--blue);}
+.rep-tile .rt{font-size:13px;font-weight:600;color:var(--text2);}
+.rep-tile.sel .rt{color:var(--blue);}
+.rep-tile .rs{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* Errors */
+.err{font-size:12px;color:var(--red);margin-top:5px;display:none;}
+
+/* Submit footer */
+.form-footer{padding:1rem 1.25rem;background:var(--dark1);border-top:1px solid var(--border);flex-shrink:0;}
+.submit-btn{
+  width:100%;padding:15px;
+  background:var(--orange);border:none;
+  border-radius:var(--r-md);
+  font-family:'Sora',sans-serif;font-size:15px;font-weight:600;
+  color:white;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 20px var(--orange-glow);
+  transition:background 0.15s,transform 0.1s;
+}
+.submit-btn:active{transform:scale(0.98);}
+.submit-btn svg{width:18px;height:18px;fill:white;}
+
+/* ── SCREEN 4 — Success ── */
+#s4{background:var(--black);justify-content:center;align-items:center;}
+.success-inner{
+  display:flex;flex-direction:column;align-items:center;
+  padding:2rem 1.5rem;text-align:center;width:100%;max-width:400px;
+}
+.success-ring{
+  width:88px;height:88px;border-radius:50%;
+  background:var(--green-bg);border:2px solid var(--green);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.5rem;
+  box-shadow:0 0 32px rgba(34,197,94,0.2);
+}
+.success-ring svg{width:44px;height:44px;fill:var(--green);}
+.success-inner h2{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;margin-bottom:8px;}
+.success-inner .sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:1.5rem;}
+.success-card{
+  background:var(--dark2);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:1.25rem;width:100%;text-align:left;margin-bottom:1.5rem;
+}
+.sc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.sc-row:last-child{border-bottom:none;}
+.sc-row .lbl{color:var(--text3);}
+.sc-row .val{font-weight:600;color:var(--text);text-align:right;max-width:60%;}
+.sc-row .val.pending{color:var(--amber);}
+.done-btn{
+  width:100%;padding:14px;
+  background:var(--dark3);border:1px solid var(--border2);
+  border-radius:var(--r-md);
+  font-family:'Sora',sans-serif;font-size:15px;font-weight:600;
+  color:var(--text2);cursor:pointer;
+  transition:background 0.15s;
+}
+.done-btn:hover{background:var(--dark4);}
+
+/* Input readonly style */
+input[readonly]{opacity:0.6;cursor:not-allowed;}
+
+/* No-results */
+.no-res{text-align:center;padding:2rem;color:var(--text3);font-size:14px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══════════════════════════════════════════
+     S1 — Name Selection
+══════════════════════════════════════════ -->
+<div class="screen active" id="s1">
+  <div class="hero" id="s1">
+    <div class="wordmark">
+      <div class="wordmark-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4"/></svg>
+      </div>
+      <div class="wordmark-text">
+        <span class="wordmark-app">LeaveFlow</span>
+        <span class="wordmark-co">AGC Car Accessories</span>
+      </div>
+    </div>
+    <h1>Who's <span>applying</span><br>for leave today?</h1>
+    <p style="margin-top:8px;color:var(--text3);font-size:14px;">Select your name to get started</p>
+  </div>
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search your name…" oninput="filterNames(this.value)" autocomplete="off"/>
+    </div>
+  </div>
+  <div class="name-list" id="nameList" style="flex:1;overflow-y:auto;padding:0.5rem 1.25rem 2rem;"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S2 — Dashboard
+══════════════════════════════════════════ -->
+<div class="screen" id="s2">
+  <div class="dash-hero">
+    <div class="dash-topbar">
+      <button class="back-btn" onclick="goTo('s1')">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="wm-sm">
+        <div class="wi">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <span>LeaveFlow</span>
+      </div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="dash-greeting">
+      <div class="hey">Hello,</div>
+      <div class="uname" id="dashName">—</div>
+    </div>
+  </div>
+  <div class="dash-body">
+    <div class="stats-grid">
+      <div class="stat-box ap"><div class="sv" id="stA">0</div><div class="sl">Approved</div></div>
+      <div class="stat-box pd"><div class="sv" id="stP">0</div><div class="sl">Pending</div></div>
+      <div class="stat-box rj"><div class="sv" id="stR">0</div><div class="sl">Rejected</div></div>
+    </div>
+    <div class="sec-hdr">
+      <h2>Leave history</h2>
+      <span class="count" id="leaveCount">—</span>
+    </div>
+    <div id="leaveCards"></div>
+    <div style="height:80px;"></div>
+  </div>
+  <div class="fab">
+    <button class="fab-btn" onclick="openForm()">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+      New Leave Request
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S3 — New Request Form
+══════════════════════════════════════════ -->
+<div class="screen" id="s3">
+  <div class="form-header">
+    <button class="back-btn" onclick="goTo('s2')">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div>
+      <h2>New Leave Request</h2>
+      <div class="sub">AGC Car Accessories</div>
+    </div>
+  </div>
+
+  <div class="form-scroll" id="formScroll">
+
+    <!-- Basic Info -->
+    <div class="fcard">
+      <div class="fcard-title">Basic information</div>
+      <div class="field">
+        <label>Date of request <span class="req">*</span></label>
+        <input type="date" id="f-reqDate"/>
+        <div class="err" id="e-reqDate">This field is required</div>
+      </div>
+      <div class="field">
+        <label>Employee name</label>
+        <input type="text" id="f-empName" readonly/>
+      </div>
+      <div class="field">
+        <label>Department <span class="req">*</span></label>
+        <select id="f-dept">
+          <option value="">Select department</option>
+          <option>Accounts</option><option>Operation</option><option>Sales</option>
+          <option>Packing</option><option>Inventory</option><option>CRM</option><option>Godown</option>
+        </select>
+        <div class="err" id="e-dept">Please select a department</div>
+      </div>
+    </div>
+
+    <!-- Leave Details -->
+    <div class="fcard">
+      <div class="fcard-title">Leave details</div>
+      <div class="field">
+        <label>Leave type <span class="req">*</span></label>
+        <div class="lt-grid">
+          <div class="lt-tile" onclick="pickLeave(this,'Casual')">
+            <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+            <span>Casual</span>
+          </div>
+          <div class="lt-tile" onclick="pickLeave(this,'Loss of Pay')">
+            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span>Loss of Pay</span>
+          </div>
+          <div class="lt-tile" onclick="pickLeave(this,'Sick Leave')">
+            <svg viewBox="0 0 24 24"><path d="M8 20v-9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v9M12 4v4M10 6h4"/></svg>
+            <span>Sick Leave</span>
+          </div>
+        </div>
+        <div class="err" id="e-leaveType">Please select a leave type</div>
+        <input type="hidden" id="f-leaveType"/>
+
+        <!-- Sick prescription -->
+        <div class="sick-block" id="sickBlock">
+          <label style="font-size:13px;font-weight:500;color:var(--text2);display:block;margin-bottom:6px;margin-top:12px;">
+            Prescription photo <span style="color:var(--text3);font-weight:400;">(optional)</span>
+          </label>
+          <div class="upload-area" onclick="document.getElementById('f-presc').click()">
+            <svg viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>
+            <p>Take photo or choose from gallery</p>
+            <div class="up-hint">Tap to open camera or file picker</div>
+            <input type="file" id="f-presc" accept="image/*" capture="environment" onchange="showPreview(this)"/>
+          </div>
+          <img id="prescPreview" class="presc-preview" alt="Prescription preview"/>
+          <div class="up-fname" id="prescFname"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Reason for absence <span class="req">*</span></label>
+        <textarea id="f-reason" placeholder="Briefly describe the reason for your leave…"></textarea>
+        <div class="err" id="e-reason">Please enter a reason</div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Leave from <span class="req">*</span></label>
+          <input type="date" id="f-from" onchange="calcDays()"/>
+          <div class="err" id="e-from">Required</div>
+        </div>
+        <div class="field">
+          <label>Leave to <span class="req">*</span></label>
+          <input type="date" id="f-to" onchange="calcDays()"/>
+          <div class="err" id="e-to">Required</div>
+        </div>
+      </div>
+      <div class="day-pill" id="dayPill"></div>
+      <div class="err" id="e-dates"></div>
+
+      <div class="field" style="margin-top:1.1rem;">
+        <label>Alternative staff <span style="color:var(--text3);font-weight:400;">(optional)</span></label>
+        <select id="f-alt">
+          <option value="">None selected</option>
+          <option>Ansila</option><option>Arjun</option><option>Arun</option><option>Farhan</option>
+          <option>Fayis</option><option>Koya</option><option>Manaf</option><option>Nazal</option>
+          <option>Praminlal</option><option>Rahib</option><option>Rakesh</option><option>Raman</option>
+          <option>Sahad</option><option>Sajith</option><option>Sarang</option><option>Shanimol</option>
+          <option>Vishak</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Reporting -->
+    <div class="fcard">
+      <div class="fcard-title">Report to</div>
+      <div class="field">
+        <div class="rep-grid">
+          <div class="rep-tile" id="rep-hr" onclick="pickReport('HR')">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div><div class="rt">HR</div><div class="rs">Human Resources</div></div>
+          </div>
+          <div class="rep-tile" id="rep-op" onclick="pickReport('Operation Head')">
+            <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <div><div class="rt">Operation Head</div><div class="rs">Operations</div></div>
+          </div>
+        </div>
+        <div class="err" id="e-report">Please select who to report to</div>
+        <input type="hidden" id="f-report"/>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="form-footer">
+    <button class="submit-btn" onclick="submitForm()">
+      <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Submit Leave Request
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     S4 — Success
+══════════════════════════════════════════ -->
+<div class="screen" id="s4">
+  <div class="success-inner">
+    <div class="success-ring">
+      <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="var(--green)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Request submitted!</h2>
+    <p class="sub" id="successMsg"></p>
+    <div class="success-card" id="successCard"></div>
+    <button class="done-btn" onclick="goTo('s2')">Back to dashboard</button>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<script>
+/* ── DATA ── */
+const EMPLOYEES=[
+  {name:'Ansila',dept:'Accounts'},{name:'Arjun',dept:'Operation'},{name:'Arun',dept:'Sales'},
+  {name:'Farhan',dept:'CRM'},{name:'Fayis',dept:'Packing'},{name:'Koya',dept:'Godown'},
+  {name:'Manaf',dept:'Operation'},{name:'Nazal',dept:'Inventory'},{name:'Praminlal',dept:'Sales'},
+  {name:'Rahib',dept:'Accounts'},{name:'Rakesh',dept:'Operation'},{name:'Raman',dept:'CRM'},
+  {name:'Sahad',dept:'Godown'},{name:'Sajith',dept:'Packing'},{name:'Sarang',dept:'Sales'},
+  {name:'Shanimol',dept:'Accounts'},{name:'Vishak',dept:'Inventory'}
+];
+
+const AV_COLORS=[
+  ['#FF6B2B22','#FF6B2B'],['#3B82F622','#3B82F6'],['#22C55E22','#22C55E'],
+  ['#F59E0B22','#F59E0B'],['#8B5CF622','#8B5CF6'],['#EC489922','#EC4899'],
+  ['#14B8A622','#14B8A6']
+];
+
+/* Dummy leave history — replace with Google Sheets fetch */
+const LEAVES={
+  'Arjun':[
+    {type:'Casual',from:'2024-06-12',to:'2024-06-16',reason:'Family function',alt:'Rakesh',report:'HR',status:'approved',days:5,reqDate:'2024-06-10'},
+    {type:'Sick Leave',from:'2024-05-04',to:'2024-05-05',reason:'Fever',alt:'',report:'HR',status:'pending',days:2,reqDate:'2024-05-04'},
+  ],
+  'Sahad':[
+    {type:'Casual',from:'2024-03-02',to:'2024-03-05',reason:'Personal',alt:'Manaf',report:'Operation Head',status:'approved',days:4,reqDate:'2024-03-01'},
+    {type:'Loss of Pay',from:'2024-04-15',to:'2024-04-15',reason:'Emergency',alt:'',report:'HR',status:'rejected',days:1,reqDate:'2024-04-14'},
+  ]
+};
+
+/* ── STATE ── */
+let currentUser=null, selLeave='', selReport='';
+
+/* ── HELPERS ── */
+const $=id=>document.getElementById(id);
+function fmtDate(d){if(!d)return'—';const[y,m,day]=d.split('-');const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return `${mo[+m-1]} ${+day}, ${y}`;}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function avColor(n){return AV_COLORS[n.charCodeAt(0)%AV_COLORS.length];}
+function days(f,t){return Math.ceil((new Date(t)-new Date(f))/864e5)+1;}
+
+/* ── NAVIGATION ── */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    if(s.id===id){s.classList.remove('slide-out');s.classList.add('active');}
+    else{s.classList.add('slide-out');s.classList.remove('active');}
+  });
+  window.scrollTo(0,0);
+}
+
+/* ── S1: NAME LIST ── */
+function buildNames(q=''){
+  const list=$('nameList');
+  const filtered=EMPLOYEES.filter(e=>e.name.toLowerCase().includes(q.toLowerCase()));
+  if(!filtered.length){list.innerHTML='<div class="no-res">No results found</div>';return;}
+  list.innerHTML=filtered.map(e=>{
+    const[bg,fg]=avColor(e.name);
+    return `<div class="name-item" onclick="selectUser('${e.name}')">
+      <div class="av" style="background:${bg};color:${fg}">${initials(e.name)}</div>
+      <div class="ni-info">
+        <div class="ni-name">${e.name}</div>
+      </div>
+      <svg class="ni-arr" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>`;
+  }).join('');
+}
+function filterNames(v){buildNames(v);}
+
+function selectUser(name){
+  currentUser=name;
+  const emp=EMPLOYEES.find(e=>e.name===name);
+  $('dashName').innerHTML=`<span style="color:var(--orange)">${name}</span>`;
+  $('f-empName').value=name;
+  if(emp) $('f-dept').value=emp.dept;
+  buildDash(name);
+  goTo('s2');
+}
+
+/* ── S2: DASHBOARD ── */
+function buildDash(name){
+  /* TODO: Replace with Google Sheets API call:
+     const SHEET_ID='YOUR_SHEET_ID_HERE';
+     const API_KEY='YOUR_API_KEY_HERE';
+     const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1?key=${API_KEY}`);
+     const rows=(await res.json()).values;
+     Filter rows where row[1]===name, map to leave objects
+  */
+  const all=(LEAVES[name]||[]).slice().reverse();
+  $('stA').textContent=all.filter(l=>l.status==='approved').length;
+  $('stP').textContent=all.filter(l=>l.status==='pending').length;
+  $('stR').textContent=all.filter(l=>l.status==='rejected').length;
+  $('leaveCount').textContent=`${all.length} record${all.length!==1?'s':''}`;
+
+  if(!all.length){
+    $('leaveCards').innerHTML=`<div class="empty-state">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <p>No leave records yet.<br/>Tap <strong style="color:var(--orange)">New Request</strong> to apply.</p>
+    </div>`;return;
+  }
+
+  const iconSVG={
+    'Casual':'<path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3"/>',
+    'Sick Leave':'<path d="M8 20v-9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v9M12 4v4M10 6h4"/>',
+    'Loss of Pay':'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'
+  };
+  const icoCls={Casual:'casual','Sick Leave':'sick','Loss of Pay':'lop'};
+
+  $('leaveCards').innerHTML=all.map(l=>{
+    const dr=l.from===l.to?fmtDate(l.from):`${fmtDate(l.from)} – ${fmtDate(l.to)}`;
+    return `<div class="lcard ${l.status}">
+      <div class="lcard-top">
+        <div class="lcard-ico ${icoCls[l.type]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconSVG[l.type]}</svg></div>
+        <div class="lcard-info">
+          <div class="lcard-type">${l.type}</div>
+          <div class="lcard-dates">${dr}</div>
+        </div>
+      </div>
+      <div class="lcard-bottom">
+        <div><div class="dur-lbl">Duration</div><div class="dur-val">${l.days} Day${l.days!==1?'s':''}</div></div>
+        <div class="badge ${l.status}">${l.status.toUpperCase()}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── S3: FORM ── */
+function openForm(){
+  resetForm();
+  goTo('s3');
+}
+
+function pickLeave(el,type){
+  document.querySelectorAll('.lt-tile').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  selLeave=type;
+  $('f-leaveType').value=type;
+  $('sickBlock').style.display=type==='Sick Leave'?'block':'none';
+  $('e-leaveType').style.display='none';
+}
+
+function pickReport(val){
+  selReport=val;
+  $('f-report').value=val;
+  $('rep-hr').classList.toggle('sel',val==='HR');
+  $('rep-op').classList.toggle('sel',val==='Operation Head');
+  $('e-report').style.display='none';
+}
+
+function showPreview(input){
+  if(!input.files||!input.files[0])return;
+  const f=input.files[0];
+  new FileReader().onload=e=>{const img=$('prescPreview');img.src=e.target.result;img.style.display='block';};
+  const fr=new FileReader();fr.onload=e=>{$('prescPreview').src=e.target.result;$('prescPreview').style.display='block';};
+  fr.readAsDataURL(f);
+  $('prescFname').textContent=f.name;$('prescFname').style.display='block';
+}
+
+function calcDays(){
+  const f=$('f-from').value,t=$('f-to').value;
+  const pill=$('dayPill'),errD=$('e-dates');
+  if(f&&t){
+    if(t<f){errD.textContent='End date cannot be before start date';errD.style.display='block';pill.style.display='none';return false;}
+    errD.style.display='none';
+    const d=days(f,t);
+    pill.textContent=`${d} day${d!==1?'s':''} selected`;pill.style.display='block';
+  }return true;
+}
+
+function showErr(id,show){$(id).style.display=show?'block':'none';}
+
+function submitForm(){
+  const reqDate=$('f-reqDate').value,dept=$('f-dept').value,
+    reason=$('f-reason').value.trim(),from=$('f-from').value,to=$('f-to').value;
+  let ok=true;
+  showErr('e-reqDate',!reqDate);if(!reqDate)ok=false;
+  showErr('e-dept',!dept);if(!dept)ok=false;
+  showErr('e-leaveType',!selLeave);if(!selLeave)ok=false;
+  showErr('e-reason',!reason);if(!reason)ok=false;
+  showErr('e-from',!from);if(!from)ok=false;
+  showErr('e-to',!to);if(!to)ok=false;
+  showErr('e-report',!selReport);if(!selReport)ok=false;
+  if(from&&to&&!calcDays())ok=false;
+  if(!ok){$('formScroll').scrollTo({top:0,behavior:'smooth'});return;}
+
+  const alt=$('f-alt').value;
+  const d=from&&to?days(from,to):1;
+
+  /* Add to session data */
+  if(!LEAVES[currentUser])LEAVES[currentUser]=[];
+  LEAVES[currentUser].unshift({type:selLeave,from,to,reason,alt,report:selReport,status:'pending',days:d,reqDate});
+
+  /* TODO: POST to Google Apps Script web app:
+     await fetch('YOUR_APPS_SCRIPT_WEB_APP_URL',{
+       method:'POST',
+       mode:'no-cors',
+       headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({name:currentUser,dept,leaveType:selLeave,from,to,reason,alt,report:selReport,days:d,reqDate,status:'Pending'})
+     });
+     Also upload prescription to Google Drive folder:
+     const FOLDER_ID='YOUR_DRIVE_FOLDER_ID_HERE';
+  */
+
+  $('successMsg').textContent=`Your ${selLeave} request has been sent to ${selReport}. You'll be notified once it's reviewed.`;
+  $('successCard').innerHTML=[
+    ['Employee',currentUser],['Leave type',selLeave],
+    ['From',fmtDate(from)],['To',fmtDate(to)],
+    ['Duration',`${d} day${d!==1?'s':''}`],
+    ...(alt?[['Alt. staff',alt]]:[]),
+    ['Reporting to',selReport],
+    ['Status','⏳ Pending']
+  ].map(([l,v])=>`<div class="sc-row"><span class="lbl">${l}</span><span class="val${l==='Status'?' pending':''}">${v}</span></div>`).join('');
+
+  goTo('s4');
+}
+
+function resetForm(){
+  selLeave='';selReport='';
+  document.querySelectorAll('.lt-tile,.rep-tile').forEach(e=>e.classList.remove('sel'));
+  ['f-leaveType','f-report','f-reason','f-from','f-to'].forEach(id=>$(id).value='');
+  $('f-reqDate').valueAsDate=new Date();
+  $('f-alt').selectedIndex=0;
+  $('sickBlock').style.display='none';
+  $('prescPreview').style.display='none';
+  $('prescFname').style.display='none';
+  $('dayPill').style.display='none';
+  document.querySelectorAll('.err').forEach(e=>e.style.display='none');
+  if(currentUser){
+    $('f-empName').value=currentUser;
+    const emp=EMPLOYEES.find(e=>e.name===currentUser);
+    if(emp)$('f-dept').value=emp.dept;
+  }
+}
+
+/* ── INIT ── */
+buildNames();
+$('f-reqDate').valueAsDate=new Date();
+</script>
+</body>
+</html>
