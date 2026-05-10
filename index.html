@@ -229,23 +229,31 @@ body{
 
 .fab{
   position:fixed;bottom:0;left:0;right:0;
-  padding:1rem 1.25rem max(1rem, env(safe-area-inset-bottom));
-  background:linear-gradient(to top,var(--black) 70%,transparent);
+  padding:0.75rem 1.25rem max(0.75rem, env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--black) 75%,transparent);
   pointer-events:none;
 }
+.fab-row{display:flex;gap:10px;pointer-events:all;}
 .fab-btn{
-  width:100%;padding:15px;
+  flex:1;padding:14px 10px;
   background:var(--orange);
   border:none;border-radius:var(--r-md);
-  font-family:'Sora',sans-serif;font-size:15px;font-weight:600;
+  font-family:'Sora',sans-serif;font-size:14px;font-weight:600;
   color:white;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
   box-shadow:0 4px 24px var(--orange-glow);
   transition:background 0.15s,transform 0.1s;
   pointer-events:all;
 }
-.fab-btn:active{transform:scale(0.98);}
-.fab-btn svg{width:20px;height:20px;fill:white;}
+.fab-btn.fab-sec{
+  background:var(--dark2);
+  border:1.5px solid var(--border2);
+  color:var(--text2);
+  box-shadow:none;
+}
+.fab-btn.fab-sec svg{fill:var(--text2);}
+.fab-btn:active{transform:scale(0.97);}
+.fab-btn svg{width:18px;height:18px;fill:white;flex-shrink:0;}
 
 /* ── SCREEN 3 — Form ── */
 #s3 .form-header{
@@ -395,6 +403,42 @@ body{
 }
 .done-btn:hover{background:var(--dark4);}
 
+/* ── SCREEN 5 — Miss Punch Form ── */
+#s5 .form-header{
+  background:var(--dark1);
+  border-bottom:1px solid var(--border);
+  padding:1rem 1.25rem;
+  display:flex;align-items:center;gap:13px;
+  flex-shrink:0;
+}
+#s5 .form-header h2{font-family:'Sora',sans-serif;font-size:17px;font-weight:600;}
+#s5 .form-header .sub{font-size:12px;color:var(--text3);margin-top:1px;}
+.form-header-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--blue-bg);border:1px solid rgba(59,130,246,0.25);
+  border-radius:20px;padding:3px 10px;
+  font-size:11px;font-weight:600;color:var(--blue);
+  margin-top:4px;width:fit-content;
+}
+
+/* Punch type tiles — 2 per row */
+.pt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.pt-tile{
+  background:var(--dark3);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:12px 10px;
+  cursor:pointer;display:flex;align-items:center;gap:9px;
+  transition:all 0.18s;
+}
+.pt-tile:active{transform:scale(0.97);}
+.pt-tile.sel{border-color:var(--blue);background:rgba(59,130,246,0.08);}
+.pt-tile svg{width:20px;height:20px;fill:var(--text3);flex-shrink:0;}
+.pt-tile.sel svg{fill:var(--blue);}
+.pt-tile .pt-lbl{font-size:12px;font-weight:600;color:var(--text2);line-height:1.3;}
+.pt-tile.sel .pt-lbl{color:var(--blue);}
+
+/* Other type input */
+.other-block{display:none;margin-top:10px;}
+
 /* Input readonly style */
 input[readonly]{opacity:0.6;cursor:not-allowed;}
 
@@ -466,10 +510,16 @@ input[readonly]{opacity:0.6;cursor:not-allowed;}
     <div style="height:80px;"></div>
   </div>
   <div class="fab">
-    <button class="fab-btn" onclick="openForm()">
-      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
-      New Leave Request
-    </button>
+    <div class="fab-row">
+      <button class="fab-btn fab-sec" onclick="openMissPunch()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Miss Punch
+      </button>
+      <button class="fab-btn" onclick="openForm()">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+        Apply Leave
+      </button>
+    </div>
   </div>
 </div>
 
@@ -629,6 +679,135 @@ input[readonly]{opacity:0.6;cursor:not-allowed;}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════
+     S5 — Miss Punch Form
+══════════════════════════════════════════ -->
+<div class="screen" id="s5">
+  <div class="form-header">
+    <button class="back-btn" onclick="goTo('s2')">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div>
+      <h2>Miss Punch Request</h2>
+      <div class="sub">AGC Car Accessories</div>
+    </div>
+  </div>
+
+  <div class="form-scroll" id="mpFormScroll">
+
+    <!-- Basic Info -->
+    <div class="fcard">
+      <div class="fcard-title">Basic information</div>
+      <div class="field">
+        <label>Date of request <span class="req">*</span></label>
+        <input type="date" id="mp-reqDate"/>
+        <div class="err" id="mp-e-reqDate">This field is required</div>
+      </div>
+      <div class="field">
+        <label>Employee name</label>
+        <input type="text" id="mp-empName" readonly/>
+      </div>
+    </div>
+
+    <!-- Punch Type -->
+    <div class="fcard">
+      <div class="fcard-title">Punch type</div>
+      <div class="field">
+        <label>Select type <span class="req">*</span></label>
+        <div class="pt-grid">
+          <div class="pt-tile" onclick="pickPunch(this,'Miss Punch')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2"/></svg>
+            <span class="pt-lbl">Miss Punch</span>
+          </div>
+          <div class="pt-tile" onclick="pickPunch(this,'Late Punch In')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="pt-lbl">Late Punch In</span>
+          </div>
+          <div class="pt-tile" onclick="pickPunch(this,'Early Punch Out')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 18 12 12 8 10"/></svg>
+            <span class="pt-lbl">Early Punch Out</span>
+          </div>
+          <div class="pt-tile" onclick="pickPunch(this,'No Punch - Godown Work')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="pt-lbl">No Punch – Godown Work</span>
+          </div>
+          <div class="pt-tile" onclick="pickPunch(this,'No Punch - Market Visit')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span class="pt-lbl">No Punch – Market Visit</span>
+          </div>
+          <div class="pt-tile" onclick="pickPunch(this,'Other')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/><circle cx="5" cy="12" r="1" fill="currentColor"/></svg>
+            <span class="pt-lbl">Other</span>
+          </div>
+        </div>
+        <div class="err" id="mp-e-punchType">Please select a punch type</div>
+        <input type="hidden" id="mp-punchType"/>
+
+        <!-- Other description -->
+        <div class="other-block" id="mp-otherBlock">
+          <div class="field" style="margin-top:10px;margin-bottom:0;">
+            <label>Specify type <span class="req">*</span></label>
+            <input type="text" id="mp-otherDesc" placeholder="Describe the punch issue…"/>
+            <div class="err" id="mp-e-otherDesc">Please specify the type</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time difference -->
+      <div class="field">
+        <label>Time difference <span class="req">*</span></label>
+        <div class="time-row">
+          <div class="field" style="margin-bottom:0;">
+            <label style="font-size:12px;color:var(--text3);">Actual punch time</label>
+            <input type="time" id="mp-actualTime" oninput="calcTimeDiff()"/>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label style="font-size:12px;color:var(--text3);">Expected punch time</label>
+            <input type="time" id="mp-expectedTime" oninput="calcTimeDiff()"/>
+          </div>
+        </div>
+        <div class="day-pill" id="mp-timeDiff" style="margin-top:8px;display:none;"></div>
+        <div class="err" id="mp-e-time">Please enter both times</div>
+      </div>
+
+      <!-- Reason -->
+      <div class="field">
+        <label>Reason <span class="req">*</span></label>
+        <textarea id="mp-reason" placeholder="Briefly explain the reason for the punch discrepancy…"></textarea>
+        <div class="err" id="mp-e-reason">Please enter a reason</div>
+      </div>
+    </div>
+
+    <!-- Reporting -->
+    <div class="fcard">
+      <div class="fcard-title">Report to</div>
+      <div class="field">
+        <div class="rep-grid">
+          <div class="rep-tile" id="mp-rep-hr" onclick="pickMpReport('HR')">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <div><div class="rt">HR</div><div class="rs">Human Resources</div></div>
+          </div>
+          <div class="rep-tile" id="mp-rep-op" onclick="pickMpReport('Operation Head')">
+            <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            <div><div class="rt">Operation Head</div><div class="rs">Operations</div></div>
+          </div>
+        </div>
+        <div class="err" id="mp-e-report">Please select who to report to</div>
+        <input type="hidden" id="mp-report"/>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="form-footer">
+    <button class="submit-btn" onclick="submitMissPunch()">
+      <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Submit Miss Punch
+    </button>
+  </div>
+</div>
+
 </div><!-- end #app -->
 
 <script>
@@ -707,6 +886,7 @@ function selectUser(name){
   av.textContent=initials(name);
   $('userChipName').textContent=name;
   $('f-empName').value=name;
+  $('mp-empName').value=name;
   if(emp) $('f-dept').value=emp.dept;
   buildDash(name);
   goTo('s2');
@@ -865,6 +1045,91 @@ function resetForm(){
     const emp=EMPLOYEES.find(e=>e.name===currentUser);
     if(emp)$('f-dept').value=emp.dept;
   }
+}
+
+/* ── S5: MISS PUNCH ── */
+let selPunch='', selMpReport='';
+
+function openMissPunch(){
+  resetMissPunch();
+  goTo('s5');
+}
+
+function pickPunch(el, type){
+  document.querySelectorAll('.pt-tile').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  selPunch=type;
+  $('mp-punchType').value=type;
+  $('mp-otherBlock').style.display=type==='Other'?'block':'none';
+  $('mp-e-punchType').style.display='none';
+}
+
+function pickMpReport(val){
+  selMpReport=val;
+  $('mp-report').value=val;
+  $('mp-rep-hr').classList.toggle('sel',val==='HR');
+  $('mp-rep-op').classList.toggle('sel',val==='Operation Head');
+  $('mp-e-report').style.display='none';
+}
+
+function calcTimeDiff(){
+  const a=$('mp-actualTime').value, e=$('mp-expectedTime').value;
+  const pill=$('mp-timeDiff');
+  if(a&&e){
+    const [ah,am]=a.split(':').map(Number), [eh,em]=e.split(':').map(Number);
+    const diffMin=Math.abs((ah*60+am)-(eh*60+em));
+    const h=Math.floor(diffMin/60), m=diffMin%60;
+    const txt=h>0?(m>0?`${h}h ${m}min difference`:`${h}h difference`):`${m}min difference`;
+    pill.textContent=txt;pill.style.display='block';
+  } else {
+    pill.style.display='none';
+  }
+}
+
+function submitMissPunch(){
+  const reqDate=$('mp-reqDate').value, reason=$('mp-reason').value.trim();
+  const actual=$('mp-actualTime').value, expected=$('mp-expectedTime').value;
+  let ok=true;
+  const se=(id,show)=>{$(id).style.display=show?'block':'none';};
+  se('mp-e-reqDate',!reqDate);if(!reqDate)ok=false;
+  se('mp-e-punchType',!selPunch);if(!selPunch)ok=false;
+  if(selPunch==='Other'){
+    const od=$('mp-otherDesc').value.trim();
+    se('mp-e-otherDesc',!od);if(!od)ok=false;
+  }
+  se('mp-e-time',!actual||!expected);if(!actual||!expected)ok=false;
+  se('mp-e-reason',!reason);if(!reason)ok=false;
+  se('mp-e-report',!selMpReport);if(!selMpReport)ok=false;
+  if(!ok){$('mpFormScroll').scrollTo({top:0,behavior:'smooth'});return;}
+
+  const displayType=selPunch==='Other'?$('mp-otherDesc').value.trim():selPunch;
+  const [ah,am]=actual.split(':').map(Number), [eh,em]=expected.split(':').map(Number);
+  const diffMin=Math.abs((ah*60+am)-(eh*60+em));
+  const h=Math.floor(diffMin/60), m=diffMin%60;
+  const diffStr=h>0?(m>0?`${h}h ${m}min`:`${h}h`):`${m}min`;
+  const fmtTime=t=>{const[hh,mm]=t.split(':');const ampm=+hh>=12?'PM':'AM';return `${+hh%12||12}:${mm} ${ampm}`;};
+
+  $('successMsg').textContent=`Your miss punch request has been sent to ${selMpReport}. You'll be notified once it's reviewed.`;
+  $('successCard').innerHTML=[
+    ['Employee',currentUser],['Type',displayType],
+    ['Date',fmtDate(reqDate)],
+    ['Actual time',fmtTime(actual)],['Expected time',fmtTime(expected)],
+    ['Difference',diffStr],['Reason',reason],
+    ['Reporting to',selMpReport],['Status','⏳ Pending']
+  ].map(([l,v])=>`<div class="sc-row"><span class="lbl">${l}</span><span class="val${l==='Status'?' pending':''}">${v}</span></div>`).join('');
+
+  goTo('s4');
+}
+
+function resetMissPunch(){
+  selPunch='';selMpReport='';
+  document.querySelectorAll('.pt-tile,.rep-tile').forEach(e=>e.classList.remove('sel'));
+  ['mp-reqDate','mp-actualTime','mp-expectedTime','mp-reason','mp-otherDesc'].forEach(id=>{const el=$(id);if(el)el.value='';});
+  $('mp-reqDate').valueAsDate=new Date();
+  $('mp-empName').value=currentUser||'';
+  $('mp-otherBlock').style.display='none';
+  $('mp-timeDiff').style.display='none';
+  document.querySelectorAll('#s5 .err').forEach(e=>e.style.display='none');
 }
 
 /* ── INIT ── */
