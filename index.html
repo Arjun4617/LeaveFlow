@@ -811,6 +811,9 @@ input[readonly]{opacity:0.6;cursor:not-allowed;}
 </div><!-- end #app -->
 
 <script>
+// ── CONFIG — paste your deployed Web App URL here ──
+const GAS_URL = 'YOUR_GAS_WEB_APP_URL';
+
 /* ── DATA ── */
 const EMPLOYEES=[
   {name:'Ansila',dept:'Accounts'},{name:'Arjun',dept:'Operation'},{name:'Arun',dept:'Sales'},
@@ -893,15 +896,38 @@ function selectUser(name){
 }
 
 /* ── S2: DASHBOARD ── */
-function buildDash(name){
-  /* TODO: Replace with Google Sheets API call:
-     const SHEET_ID='YOUR_SHEET_ID_HERE';
-     const API_KEY='YOUR_API_KEY_HERE';
-     const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1?key=${API_KEY}`);
-     const rows=(await res.json()).values;
-     Filter rows where row[1]===name, map to leave objects
-  */
-  const all=(LEAVES[name]||[]).slice().reverse();
+async function buildDash(name) {
+  // Show loading state
+  $('leaveCards').innerHTML = '<div class="empty-state"><p style="color:var(--text3)">Loading…</p></div>';
+  $('stA').textContent=$('stP').textContent=$('stR').textContent='—';
+
+  let all = [];
+
+  if (GAS_URL && GAS_URL !== 'YOUR_GAS_WEB_APP_URL') {
+    try {
+      const res  = await fetch(`${GAS_URL}?name=${encodeURIComponent(name)}&tab=leave`);
+      const json = await res.json();
+      if (json.ok && json.records.length) {
+        all = json.records.map(r => ({
+          type    : r['Leave Type'],
+          from    : r['From'],
+          to      : r['To'],
+          reason  : r['Reason'],
+          alt     : r['Alt. Staff'],
+          report  : r['Reporting To'],
+          status  : (r['Status'] || 'pending').toLowerCase(),
+          days    : Number(r['Days']) || 1,
+          reqDate : r['Request Date']
+        }));
+      }
+    } catch(err) {
+      console.warn('GAS fetch failed, using local data:', err);
+      all = (LEAVES[name] || []).slice().reverse();
+    }
+  } else {
+    // Fallback to local dummy data when URL not configured
+    all = (LEAVES[name] || []).slice().reverse();
+  }
   $('stA').textContent=all.filter(l=>l.status==='approved').length;
   $('stP').textContent=all.filter(l=>l.status==='pending').length;
   $('stR').textContent=all.filter(l=>l.status==='rejected').length;
@@ -910,7 +936,7 @@ function buildDash(name){
   if(!all.length){
     $('leaveCards').innerHTML=`<div class="empty-state">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      <p>No leave records yet.<br/>Tap <strong style="color:var(--orange)">New Request</strong> to apply.</p>
+      <p>No leave records yet.<br/>Tap <strong style="color:var(--orange)">Apply Leave</strong> to apply.</p>
     </div>`;return;
   }
 
@@ -1001,20 +1027,24 @@ function submitForm(){
   const alt=$('f-alt').value;
   const d=from&&to?days(from,to):1;
 
-  /* Add to session data */
+  /* Add to local session data (instant UI update) */
   if(!LEAVES[currentUser])LEAVES[currentUser]=[];
   LEAVES[currentUser].unshift({type:selLeave,from,to,reason,alt,report:selReport,status:'pending',days:d,reqDate});
 
-  /* TODO: POST to Google Apps Script web app:
-     await fetch('YOUR_APPS_SCRIPT_WEB_APP_URL',{
-       method:'POST',
-       mode:'no-cors',
-       headers:{'Content-Type':'application/json'},
-       body:JSON.stringify({name:currentUser,dept,leaveType:selLeave,from,to,reason,alt,report:selReport,days:d,reqDate,status:'Pending'})
-     });
-     Also upload prescription to Google Drive folder:
-     const FOLDER_ID='YOUR_DRIVE_FOLDER_ID_HERE';
-  */
+  /* POST to Google Apps Script — fire and forget */
+  if(GAS_URL && GAS_URL !== 'YOUR_GAS_WEB_APP_URL'){
+    fetch(GAS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        formType:'leave',
+        name:currentUser, dept, leaveType:selLeave,
+        from, to, days:d, reason, alt,
+        report:selReport, reqDate
+      })
+    }).catch(err=>console.warn('GAS post failed:',err));
+  }
 
   $('successMsg').textContent=`Your ${selLeave} request has been sent to ${selReport}. You'll be notified once it's reviewed.`;
   $('successCard').innerHTML=[
@@ -1108,6 +1138,21 @@ function submitMissPunch(){
   const h=Math.floor(diffMin/60), m=diffMin%60;
   const diffStr=h>0?(m>0?`${h}h ${m}min`:`${h}h`):`${m}min`;
   const fmtTime=t=>{const[hh,mm]=t.split(':');const ampm=+hh>=12?'PM':'AM';return `${+hh%12||12}:${mm} ${ampm}`;};
+
+  /* POST to Google Apps Script — fire and forget */
+  if(GAS_URL && GAS_URL !== 'YOUR_GAS_WEB_APP_URL'){
+    fetch(GAS_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        formType:'punch',
+        name:currentUser, punchType:displayType,
+        reqDate, actualTime:actual, expectedTime:expected,
+        timeDiff:diffStr, reason, report:selMpReport
+      })
+    }).catch(err=>console.warn('GAS post failed:',err));
+  }
 
   $('successMsg').textContent=`Your miss punch request has been sent to ${selMpReport}. You'll be notified once it's reviewed.`;
   $('successCard').innerHTML=[
