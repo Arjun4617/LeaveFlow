@@ -137,14 +137,15 @@ body{
 /* ── SCREEN 2 — Dashboard ── */
 #s2 .dash-hero{
   background:var(--dark1);
-  padding:1rem 1.25rem 3.5rem;
-  position:relative;overflow:hidden;
+  padding:0.75rem 1.25rem;
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;flex-shrink:0;
 }
 #s2 .dash-hero::before{
-  content:'';position:absolute;top:-80px;right:-80px;width:240px;height:240px;border-radius:50%;
+  content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;
   background:radial-gradient(circle,var(--orange-glow) 0%,transparent 70%);pointer-events:none;
 }
-.dash-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+.dash-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .back-btn{
   width:38px;height:38px;border-radius:50%;
   background:var(--dark3);border:1px solid var(--border);
@@ -153,15 +154,28 @@ body{
 }
 .back-btn:hover{background:var(--dark4);}
 .back-btn svg{width:18px;height:18px;fill:var(--text2);}
-.dash-topbar .wm-sm{display:flex;align-items:center;gap:8px;}
+.dash-topbar .wm-sm{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;}
 .dash-topbar .wm-sm .wi{width:30px;height:30px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;}
 .dash-topbar .wm-sm .wi svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;}
 .dash-topbar .wm-sm span{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;}
-.dash-greeting .hey{font-size:13px;color:var(--text3);}
-.dash-greeting .uname{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;}
-.dash-greeting .uname span{color:var(--orange);}
+.user-chip{
+  display:flex;align-items:center;gap:6px;
+  background:var(--dark3);border:1px solid var(--border2);
+  border-radius:20px;padding:4px 10px 4px 5px;
+  flex-shrink:0;max-width:110px;
+}
+.user-chip .uc-av{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Sora',sans-serif;font-size:9px;font-weight:700;
+  flex-shrink:0;
+}
+.user-chip .uc-name{
+  font-size:12px;font-weight:600;color:var(--orange);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
 
-.dash-body{flex:1;overflow-y:auto;padding:0 1.25rem 2rem;margin-top:-4rem;overscroll-behavior:contain;}
+.dash-body{flex:1;overflow-y:auto;padding:1rem 1.25rem 2rem;overscroll-behavior:contain;}
 .dash-body::-webkit-scrollbar{width:3px;}
 .dash-body::-webkit-scrollbar-thumb{background:var(--dark4);border-radius:4px;}
 
@@ -432,11 +446,10 @@ input[readonly]{opacity:0.6;cursor:not-allowed;}
         </div>
         <span>LeaveFlow</span>
       </div>
-      <div style="width:38px;"></div>
-    </div>
-    <div class="dash-greeting">
-      <div class="hey">Hello,</div>
-      <div class="uname" id="dashName">—</div>
+      <div class="user-chip" id="userChip">
+        <div class="uc-av" id="userChipAv"></div>
+        <span class="uc-name" id="userChipName">—</span>
+      </div>
     </div>
   </div>
   <div class="dash-body">
@@ -687,7 +700,12 @@ function filterNames(v){buildNames(v);}
 function selectUser(name){
   currentUser=name;
   const emp=EMPLOYEES.find(e=>e.name===name);
-  $('dashName').innerHTML=`<span style="color:var(--orange)">${name}</span>`;
+  // populate compact user chip
+  const[bg,fg]=avColor(name);
+  const av=$('userChipAv');
+  av.style.background=bg;av.style.color=fg;
+  av.textContent=initials(name);
+  $('userChipName').textContent=name;
   $('f-empName').value=name;
   if(emp) $('f-dept').value=emp.dept;
   buildDash(name);
