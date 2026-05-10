@@ -37,7 +37,7 @@
   --r-xl: 28px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;}
+html,body{height:100%;height:100dvh;overflow:hidden;}
 body{
   font-family:'DM Sans',sans-serif;
   background:var(--black);
@@ -47,7 +47,7 @@ body{
 }
 
 /* ── App shell ── */
-#app{width:100%;height:100vh;overflow:hidden;position:relative;}
+#app{width:100%;height:100vh;height:100dvh;overflow:hidden;position:relative;}
 .screen{
   position:absolute;inset:0;
   display:flex;flex-direction:column;
@@ -65,7 +65,7 @@ body{
 /* ── SCREEN 1 — Splash / Name pick ── */
 #s1 .hero{
   background:var(--dark1);
-  padding:3.5rem 1.5rem 2.5rem;
+  padding:2rem 1.5rem 1.5rem;
   position:relative;overflow:hidden;
 }
 #s1 .hero::before{
@@ -88,7 +88,7 @@ body{
   box-shadow:0 0 24px var(--orange-glow);
   flex-shrink:0;
 }
-.wordmark-icon svg{width:22px;height:22px;fill:white;}
+.wordmark-icon svg{width:22px;height:22px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;}
 .wordmark-text{display:flex;flex-direction:column;line-height:1.1;}
 .wordmark-app{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;color:var(--text);}
 .wordmark-co{font-size:11px;color:var(--text3);letter-spacing:0.04em;margin-top:2px;}
@@ -137,7 +137,7 @@ body{
 /* ── SCREEN 2 — Dashboard ── */
 #s2 .dash-hero{
   background:var(--dark1);
-  padding:1.5rem 1.25rem 5rem;
+  padding:1rem 1.25rem 3.5rem;
   position:relative;overflow:hidden;
 }
 #s2 .dash-hero::before{
@@ -155,7 +155,7 @@ body{
 .back-btn svg{width:18px;height:18px;fill:var(--text2);}
 .dash-topbar .wm-sm{display:flex;align-items:center;gap:8px;}
 .dash-topbar .wm-sm .wi{width:30px;height:30px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;}
-.dash-topbar .wm-sm .wi svg{width:16px;height:16px;fill:white;}
+.dash-topbar .wm-sm .wi svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;}
 .dash-topbar .wm-sm span{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;}
 .dash-greeting .hey{font-size:13px;color:var(--text3);}
 .dash-greeting .uname{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;}
@@ -215,7 +215,7 @@ body{
 
 .fab{
   position:fixed;bottom:0;left:0;right:0;
-  padding:1rem 1.25rem;
+  padding:1rem 1.25rem max(1rem, env(safe-area-inset-bottom));
   background:linear-gradient(to top,var(--black) 70%,transparent);
   pointer-events:none;
 }
@@ -398,7 +398,7 @@ input[readonly]{opacity:0.6;cursor:not-allowed;}
   <div class="hero" id="s1">
     <div class="wordmark">
       <div class="wordmark-icon">
-        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4"/></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="12" y1="12" x2="4.8" y2="19.2"/><line x1="12" y1="12" x2="19.2" y2="19.2"/></svg>
       </div>
       <div class="wordmark-text">
         <span class="wordmark-app">LeaveFlow</span>
@@ -428,7 +428,7 @@ input[readonly]{opacity:0.6;cursor:not-allowed;}
       </button>
       <div class="wm-sm">
         <div class="wi">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="12" y1="12" x2="4.8" y2="19.2"/><line x1="12" y1="12" x2="19.2" y2="19.2"/></svg>
         </div>
         <span>LeaveFlow</span>
       </div>
